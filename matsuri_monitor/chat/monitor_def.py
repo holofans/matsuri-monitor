@@ -53,8 +53,8 @@ def _username_condition(value: str) -> Callable[[Message], bool]:
 
 
 @dataclass
-class Grouper:
-    """Defines a grouper used to group chat messages for a report"""
+class MonitorDef:
+    """Defines a monitor used to identify a spike chat messages for a report"""
     condition: Callable
     description: str
     interval: float
@@ -64,9 +64,9 @@ class Grouper:
     skip_channels: List[str]
 
     @classmethod
-    def load(cls) -> List[Grouper]:
-        """Load and return groupers defined in the passed JSON file"""
-        grouper_defs = json.load(tornado.options.options.grouper_file.open())
+    def load(cls) -> List[MonitorDef]:
+        """Load and return monitor definitions in the passed JSON file"""
+        grouper_defs = json.load(tornado.options.options.grouper_file.open(encoding='utf-8'))
 
         jsonschema.validate(grouper_defs, GROUPER_SCHEMA)
 

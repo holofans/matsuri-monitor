@@ -1,12 +1,12 @@
 from typing import Callable, List
 
-from matsuri_monitor.chat.grouper import Grouper
+from matsuri_monitor.chat.monitor_def import MonitorDef
 from matsuri_monitor.chat.message import Message
 
 
-class GroupList:
+class Monitor:
 
-    def __init__(self, grouper: Grouper):
+    def __init__(self, grouper: MonitorDef):
         """init
 
         Parameters

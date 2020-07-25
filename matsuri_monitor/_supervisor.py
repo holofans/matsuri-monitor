@@ -28,7 +28,7 @@ class Supervisor:
         self.interval = interval
         self.jetri = clients.Jetri()
         self.live_monitors: Dict[str, Monitor] = OrderedDict()
-        self.groupers = chat.Grouper.load()
+        self.groupers = chat.MonitorDef.load()
         tornado.options.options.archives_dir.mkdir(exist_ok=True)
 
     async def update(self, current_ioloop: tornado.ioloop.IOLoop = None):
@@ -47,7 +47,7 @@ class Supervisor:
         logger.info('[Begin supervisor update]')
 
         # Refresh groupers
-        new_groupers = chat.Grouper.load()
+        new_groupers = chat.MonitorDef.load()
         if new_groupers != self.groupers:
             for monitor in self.live_monitors.values():
                 monitor.report.set_groupers(new_groupers)

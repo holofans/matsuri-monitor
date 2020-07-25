@@ -5,6 +5,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
+import asyncio
 
 from matsuri_monitor import Supervisor, handlers
 
@@ -21,6 +22,9 @@ def main():
     static_url_prefix = r'/_monitor/static/'
 
     print(static_path)
+
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    # required for python 3.8 to work with asyncio.
 
     server = tornado.httpserver.HTTPServer(
         tornado.web.Application(

@@ -11,8 +11,8 @@ from typing import Callable, List
 from cachetools import LRUCache, cached
 import tornado.options
 
-from matsuri_monitor.chat.group_list import GroupList
-from matsuri_monitor.chat.grouper import Grouper
+from matsuri_monitor.chat.monitor import Monitor
+from matsuri_monitor.chat.monitor_def import MonitorDef
 from matsuri_monitor.chat.info import VideoInfo
 from matsuri_monitor.chat.message import Message
 
@@ -32,18 +32,18 @@ class LiveReport:
         """
         self.info = info
         self.group_lock = mp.Lock()
-        self.group_lists: List[GroupList] = []
+        self.group_lists: List[Monitor] = []
         self.message_lock = mp.Lock()
         self.messages: List[Message] = []
 
-    def set_groupers(self, groupers: List[Grouper]):
+    def set_groupers(self, groupers: List[MonitorDef]):
         """Set the groupers used to generate this report"""
         with self.message_lock:
             messages = self.messages
 
         include = lambda g: self.info.channel.id not in g.skip_channels
         with self.group_lock:
-            self.group_lists = list(map(GroupList, filter(include, groupers)))
+            self.group_lists = list(map(Monitor, filter(include, groupers)))
             for group_list in self.group_lists:
                 group_list.update(messages)
 
@@ -63,22 +63,23 @@ class LiveReport:
 
     def save(self):
         """Save report to archives directory and finalize"""
-        report_datetime = datetime.fromtimestamp(self.info.start_timestamp).isoformat(timespec='seconds')
-        report_basename = f'{report_datetime}_{self.info.id}'.replace(':', '')
-        report_path = tornado.options.options.archives_dir / f'{report_basename}.json.gz'
+        return
+        # report_datetime = datetime.fromtimestamp(self.info.start_timestamp).isoformat(timespec='seconds')
+        # report_basename = f'{report_datetime}_{self.info.id}'.replace(':', '')
+        # report_path = tornado.options.options.archives_dir / f'{report_basename}.json.gz'
 
-        if tornado.options.options.dump_chat:
-            messages_json = [msg.json() for msg in self.messages]
-            messages_path = tornado.options.options.archives_dir / f'{report_basename}_chat.json.gz'
+        # if tornado.options.options.dump_chat:
+        #     messages_json = [msg.json() for msg in self.messages]
+        #     messages_path = tornado.options.options.archives_dir / f'{report_basename}_chat.json.gz'
 
-            with gzip.open(messages_path, 'wt') as dump_file:
-                json.dump(messages_json, dump_file)
+        #     with gzip.open(messages_path, 'wt') as dump_file:
+        #         json.dump(messages_json, dump_file)
 
-        if len(self) == 0:
-            return
+        # if len(self) == 0:
+        #     return
 
-        with gzip.open(report_path, 'wt') as report_file:
-            json.dump(self.json(), report_file)
+        # with gzip.open(report_path, 'wt') as report_file:
+        #     json.dump(self.json(), report_file)
 
     def json(self) -> dict:
         """Return a JSON representation of this report"""
