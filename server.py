@@ -18,10 +18,7 @@ def main():
     """Create app and start server"""
     supervisor = Supervisor(tornado.options.options.interval)
 
-    static_path = Path(__file__).parent.absolute() / 'matsuri_monitor' / 'static'
-    static_url_prefix = r'/_monitor/static/'
-
-    print(static_path)
+    # print(static_path)
 
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     # required for python 3.8 to work with asyncio.
@@ -30,12 +27,8 @@ def main():
         tornado.web.Application(
             [
                 (r'/_monitor', handlers.MainHandler),
-                # (r'/_monitor/live.json', handlers.APIHandler, {'json_source': supervisor.live_json}),
-                # (r'/_monitor/archive.json', handlers.ArchivesHandler),
             ],
             debug=tornado.options.options.debug,
-            static_path=static_path,
-            static_url_prefix=static_url_prefix,
         )
     )
 
