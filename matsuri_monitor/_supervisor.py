@@ -27,7 +27,7 @@ class Supervisor:
         super().__init__()
         self.interval = interval
         self.jetri = clients.Jetri()
-        self.live_monitors: Dict[str, Monitor] = OrderedDict()
+        self.live_monitors: Dict[str, chat.Monitor] = OrderedDict()
         self.groupers = chat.MonitorDef.load()
         tornado.options.options.archives_dir.mkdir(exist_ok=True)
 
@@ -97,10 +97,10 @@ class Supervisor:
 
         logger.info('[End supervisor update]')
 
-    @cached(TTLCache(1, 5))
-    def live_json(self) -> dict:
-        """JSON object containing reports of all currently live streams"""
-        return {'reports': [monitor.report.json() for monitor in self.live_monitors.values() if monitor.is_running]}
+    # @cached(TTLCache(1, 5))
+    # def live_json(self) -> dict:
+    #     """JSON object containing reports of all currently live streams"""
+    #     return {'reports': [monitor.report.json() for monitor in self.live_monitors.values() if monitor.is_running]}
 
     def start(self, current_ioloop: tornado.ioloop.IOLoop):
         """Begin update loop"""

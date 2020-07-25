@@ -32,7 +32,7 @@ class LiveReport:
         """
         self.info = info
         self.group_lock = mp.Lock()
-        self.group_lists: List[Monitor] = []
+        self.monitors: List[Monitor] = []
         self.message_lock = mp.Lock()
         self.messages: List[Message] = []
 
@@ -43,9 +43,9 @@ class LiveReport:
 
         include = lambda g: self.info.channel.id not in g.skip_channels
         with self.group_lock:
-            self.group_lists = list(map(Monitor, filter(include, groupers)))
-            for group_list in self.group_lists:
-                group_list.update(messages)
+            self.monitors = list(map(Monitor, filter(include, groupers)))
+            for monitor in self.monitors:
+                monitor.update(messages)
 
     def add_messages(self, new_messages: List[Message]):
         """Add new messages and recompute groups from them"""
@@ -58,8 +58,8 @@ class LiveReport:
             messages = self.messages
 
         with self.group_lock:
-            for group_list in self.group_lists:
-                group_list.update(messages)
+            for monitor in self.monitors:
+                monitor.update(messages)
 
     def save(self):
         """Save report to archives directory and finalize"""
@@ -108,7 +108,7 @@ class LiveReport:
                             for group in group_list.groups
                         ]
                     }
-                    for group_list in filter(lambda gl: len(gl) > 0, self.group_lists)
+                    for group_list in filter(lambda gl: len(gl) > 0, self.monitors)
                 ]
             }
 
@@ -117,4 +117,4 @@ class LiveReport:
     def __len__(self):
         """The total number of groups in this report, across all lists"""
         with self.group_lock:
-            return sum(map(len, self.group_lists))
+            return sum(map(len, self.monitors))
